@@ -3,10 +3,13 @@ package com.devsuperior.demo.services;
 import com.devsuperior.demo.comparators.CityComparatorByName;
 import com.devsuperior.demo.dto.CityDTO;
 import com.devsuperior.demo.entities.City;
+import com.devsuperior.demo.exceptions.DatabaseException;
+import com.devsuperior.demo.exceptions.ResourceNotFoundException;
 import com.devsuperior.demo.repositories.CityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -31,16 +34,16 @@ public class CityService {
         return new CityDTO(entity);
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void delete(Long id) {
         if(!repository.existsById(id)){
-            ////
+            throw new ResourceNotFoundException("Cidade não encontrada");
         }
         try {
             repository.deleteById(id);
         }
         catch (DataIntegrityViolationException e) {
-            ////////////
+            throw new DatabaseException("Falha de integridade");
         }
 
     }
