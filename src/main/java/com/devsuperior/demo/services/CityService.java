@@ -19,4 +19,15 @@ public class CityService {
         entities.sort(new CityComparatorByName());
         return entities.stream().map(CityDTO::new).toList();
     }
+
+    public CityDTO insert(CityDTO dto) {
+        City entity = new City();
+        cityDtoToCity(dto, entity);
+        entity = repository.save(entity);
+        return new CityDTO(entity);
+    }
+
+    private void cityDtoToCity(CityDTO dto, City entity){
+        entity.setName(dto.getName());
+    }
 }
