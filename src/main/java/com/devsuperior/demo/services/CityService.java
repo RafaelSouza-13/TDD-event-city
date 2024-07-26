@@ -5,7 +5,9 @@ import com.devsuperior.demo.dto.CityDTO;
 import com.devsuperior.demo.entities.City;
 import com.devsuperior.demo.repositories.CityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,12 +16,14 @@ public class CityService {
     @Autowired
     CityRepository repository;
 
+    @Transactional(readOnly = true)
     public List<CityDTO> findAll(){
         List<City> entities = repository.findAll();
         entities.sort(new CityComparatorByName());
         return entities.stream().map(CityDTO::new).toList();
     }
 
+    @Transactional
     public CityDTO insert(CityDTO dto) {
         City entity = new City();
         cityDtoToCity(dto, entity);
@@ -27,7 +31,23 @@ public class CityService {
         return new CityDTO(entity);
     }
 
+    @Transactional
+    public void delete(Long id) {
+        if(!repository.existsById(id)){
+            ////
+        }
+        try {
+            repository.deleteById(id);
+        }
+        catch (DataIntegrityViolationException e) {
+            ////////////
+        }
+
+    }
+
     private void cityDtoToCity(CityDTO dto, City entity){
         entity.setName(dto.getName());
     }
+
+
 }
